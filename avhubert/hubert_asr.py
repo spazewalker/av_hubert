@@ -85,7 +85,7 @@ class AVHubertAsrConfig(FairseqDataclass):
             "(normalized by length)"
         },
     )
-    mask_selection: MASKING_DISTRIBUTION_CHOICES = field(
+    mask_selection: str = field(
         default="static", metadata={"help": "how to choose masks"}
     )
     mask_other: float = field(
@@ -109,7 +109,7 @@ class AVHubertAsrConfig(FairseqDataclass):
         default=0.0,
         metadata={"help": "probability of replacing a feature with 0"},
     )
-    mask_channel_selection: MASKING_DISTRIBUTION_CHOICES = field(
+    mask_channel_selection: str = field(
         default="static",
         metadata={"help": "how to choose mask length for channel masking"},
     )

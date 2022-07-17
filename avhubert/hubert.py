@@ -65,7 +65,7 @@ MASKING_DISTRIBUTION_CHOICES = ChoiceEnum(
 class AVHubertConfig(FairseqDataclass):
     label_rate: int = II("task.label_rate")
     input_modality: str = II("task.input_modality")
-    extractor_mode: EXTRACTOR_MODE_CHOICES = field(
+    extractor_mode: str = field(
         default="default",
         metadata={
             "help": "mode for feature extractor. default has a single group "
@@ -85,7 +85,7 @@ class AVHubertConfig(FairseqDataclass):
     encoder_attention_heads: int = field(
         default=12, metadata={"help": "num encoder attention heads"}
     )
-    activation_fn: ChoiceEnum(utils.get_available_activation_fns()) = field(
+    activation_fn: str = field(
         default="gelu", metadata={"help": "activation function to use"}
     )
 
@@ -165,7 +165,7 @@ class AVHubertConfig(FairseqDataclass):
         default=0.65,
         metadata={"help": "probability of replacing a token with mask"},
     )
-    mask_selection: MASKING_DISTRIBUTION_CHOICES = field(
+    mask_selection: str = field(
         default="static", metadata={"help": "how to choose mask length"}
     )
     mask_other: float = field(
@@ -195,7 +195,7 @@ class AVHubertConfig(FairseqDataclass):
         default=0.0,
         metadata={"help": "probability of replacing a feature with 0"},
     )
-    mask_channel_selection: MASKING_DISTRIBUTION_CHOICES = field(
+    mask_channel_selection: str = field(
         default="static",
         metadata={"help": "how to choose mask length for channel masking"},
     )
@@ -540,7 +540,7 @@ class AVHubertModel(BaseFairseqModel):
         if self.feature_grad_mult > 0:
             features = extractor(source)
             if self.feature_grad_mult != 1.0:
-                features = GradMultiply.apply(features, self.feature_grad_mult)
+                features = self.feature_grad_mult*features
         else:
             with torch.no_grad():
                 features = extractor(source)
@@ -593,7 +593,7 @@ class AVHubertModel(BaseFairseqModel):
         source: torch.Tensor,
         target_list: Optional[List[torch.Tensor]] = None,
         padding_mask: Optional[torch.Tensor] = None,
-        mask: bool = True,
+        mask: bool = False,
         features_only: bool = False,
         output_layer: Optional[int] = None
     ) -> Dict[str, torch.Tensor]:
